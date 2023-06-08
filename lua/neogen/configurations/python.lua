@@ -213,20 +213,6 @@ return {
                                         subtree = {
                                             {
                                                 retrieve = "first",
-                                                node_type = "yield",
-                                                recursive = true,
-                                                extract = true,
-                                                as = i.Yield,
-                                            },
-                                        },
-                                    },
-                                    {
-                                        retrieve = "all",
-                                        node_type = "raise_statement",
-                                        recursive = true,
-                                        subtree = {
-                                            {
-                                                retrieve = "first",
                                                 node_type = "call",
                                                 recursive = true,
                                                 subtree = {
