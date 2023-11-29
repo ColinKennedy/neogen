@@ -125,7 +125,6 @@ local validate_yield_nodes = function(nodes)
     then
         nodes[i.Return] = nil
     end
-end
 
 
 return {
