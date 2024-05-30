@@ -14,7 +14,7 @@ jobs:
     - name: Checkout neogen
       uses: actions/checkout@v4
       with:
-        repository: danymat/neogen
+        repository: ColinKennedy/neogen
         path: neogen
     - uses: rhysd/action-setup-vim@v1
       with:
