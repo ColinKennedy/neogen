@@ -234,8 +234,100 @@ local function generate_content(parent, data, template, required_type, annotatio
     return row, result, default_text
 end
 
+
+local function expand_sections(sections)
+    local i = require("neogen.types.template").item
+    -- TODO: Make this real later
+    return {i.HasParameter, i.Parameter}
+end
+
+
+local function has_common_element(left, right)
+    for _, key in ipairs(left) do
+        if vim.tbl_contains(right, key) then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function filter_data_by_sections(data, sections)
+    local i = require("neogen.types.template").item
+
+    local argument_related_keys = {
+        i.ArbitraryArgs,
+        i.HasParameter,
+        i.Kwargs,
+        i.Parameter,
+        i.Tparam,
+        i.Vararg,
+    }
+
+    local return_related_keys = {
+        i.Return,
+        i.ReturnTypeHint,
+        i.ReturnAnonym,
+        i.HasReturn,
+    }
+
+    local throw_related_keys = { i.HasThrow, i.Throw }
+
+    local yield_related_keys = { i.HasYield, i.Yield }
+
+    local section_groups = {
+        [i.ArbitraryArgs] = argument_related_keys,
+        [i.HasParameter] = argument_related_keys,
+        [i.Kwargs] = argument_related_keys,
+        [i.Parameter] = argument_related_keys,
+        [i.Tparam] = argument_related_keys,
+        [i.Vararg] = argument_related_keys,
+
+        [i.HasReturn] = return_related_keys,
+        [i.ReturnAnonym] = return_related_keys,
+        [i.ReturnTypeHint] = return_related_keys,
+        [i.Return] = return_related_keys,
+
+        [i.HasYield] = yield_related_keys,
+        [i.Yield] = yield_related_keys,
+
+        [i.HasThrow] = throw_related_keys,
+        [i.Throw] = throw_related_keys,
+    }
+
+    -- TODO: Add this stuff, maybe
+    -- ClassName = "class_name",
+    -- Type = "type",
+    -- ClassAttribute = "attributes",
+
+    local to_remove = {}
+
+    for section, _ in pairs(data) do
+        local section_group = section_groups[section] or {section}
+
+        if not has_common_element(section_group, sections) then
+            vim.list_extend(to_remove, section_group)
+        end
+    end
+
+    local output = {}
+
+    print('DEBUGPRINT[4]: generator.lua:301: to_remove=' .. vim.inspect(to_remove))
+
+    print('DEBUGPRINT[5]: generator.lua:302: data=' .. vim.inspect(data))
+    for section, value in pairs(data) do
+        if not vim.tbl_contains(to_remove, section) then
+            output[section] = value
+        end
+    end
+
+    return output
+end
+
+
 return setmetatable({}, {
-    __call = function(_, filetype, node_type, return_snippet, annotation_convention)
+    __call = function(_, filetype, node_type, return_snippet, annotation_convention, sections)
+        print('DEBUGPRINT[9]: generator.lua:329: sections=' .. vim.inspect(sections))
         if filetype == "" then
             notify("No filetype detected", vim.log.levels.WARN)
             return
@@ -279,6 +371,11 @@ return setmetatable({}, {
 
         local data = granulator(parent_node, language.data[node_type])
 
+        if sections then
+            data = filter_data_by_sections(data, expand_sections(sections))
+            print('DEBUGPRINT[2]: generator.lua:355: data=' .. vim.inspect(data))
+        end
+
         -- Will try to generate the documentation from a template and the data found from the granulator
         local row, template_content, default_text =
             generate_content(parent_node, data, template, node_type, annotation_convention[filetype])
@@ -289,6 +386,7 @@ return setmetatable({}, {
         local input_after_comment = conf.input_after_comment
 
         local pattern = JUMP_TEXT .. (input_after_comment and "[|%w]*" or "|?")
+        print('DEBUGPRINT[3]: generator.lua:292: template_content=' .. vim.inspect(template_content))
         for r, line in ipairs(template_content) do
             local last_col = 0
             local len = 1

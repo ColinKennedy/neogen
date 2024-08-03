@@ -2,10 +2,18 @@
 ---
 --- @module 'tests.neogen.python_spec'
 
+local i = require("neogen.types.template").item
 local specs = require('tests.utils.specs')
 
-local function make_google_docstrings(source)
-    return specs.make_docstring(source, 'python', { annotation_convention = { python = 'google_docstrings' } })
+local function make_google_docstrings(source, sections)
+    return specs.make_docstring(
+        source,
+        'python',
+        {
+            annotation_convention = { python = 'google_docstrings' },
+            sections = sections,
+        }
+    )
 end
 
 describe("python: google_docstrings", function()
@@ -181,6 +189,59 @@ describe("python: google_docstrings", function()
         ]]
 
             local result = make_google_docstrings(source)
+
+            assert.equal(expected, result)
+        end)
+
+        it("works with sections + nested functions", function()
+            local source = [[
+        class Thing(object):
+            def foo(self, bar, fizz, buzz):
+                def another(inner, function):
+                    def inner_most(more, stuff):
+                        """Some text.
+
+                        |cursor|
+
+                        Yields:
+                            Something.
+
+                        """
+                        if more:
+                            raise ValueError("asdf")
+
+                        if stuff:
+                            yield 10
+
+                        yield
+                        return
+        ]]
+
+            local expected = [[
+        class Thing(object):
+            def foo(self, bar, fizz, buzz):
+                def another(inner, function):
+                    def inner_most(more, stuff: str):
+                        """Some text.
+
+                        Args:
+                            mode ([TODO:description]): [TODO:description]
+
+                        Yields:
+                            Something.
+
+                        """
+                        if more:
+                            raise ValueError("asdf")
+
+                        if stuff:
+                            yield 10
+
+                        yield
+                        return
+        ]]
+
+            local result = make_google_docstrings(source, {i.Parameter})
 
             assert.equal(expected, result)
         end)

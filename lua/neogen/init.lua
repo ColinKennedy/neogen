@@ -167,7 +167,14 @@ neogen.generate = function(opts)
     end
 
     opts = opts or {}
-    return require("neogen.generator")(vim.bo.filetype, opts.type, opts.return_snippet, opts.annotation_convention)
+
+    return require("neogen.generator")(
+        vim.bo.filetype,
+        opts.type,
+        opts.return_snippet,
+        opts.annotation_convention,
+        opts.sections
+    )
 end
 
 -- Expose more API  ============================================================
