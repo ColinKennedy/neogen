@@ -940,11 +940,11 @@ describe("python: google_docstrings", function()
             else:
                 yield 0
 
-            bor _ in range(10):
+            for _ in range(10):
                 yield
         ]]
 
-            local result = make_google_docstrings(source, {"yields"})
+            local result = make_google_docstrings(source, {"yield"})
 
             assert.equal(expected, result)
         end)
@@ -987,7 +987,7 @@ describe("python: google_docstrings", function()
                 yield
         ]]
 
-            local result = make_google_docstrings(source, {"parameters", "yields"})
+            local result = make_google_docstrings(source, {"parameters", "yield"})
 
             assert.equal(expected, result)
         end)
