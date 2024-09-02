@@ -167,7 +167,7 @@ neogen.generate = function(opts)
     end
 
     opts = opts or {}
-    return require("neogen.generator")(vim.bo.filetype, opts.type, opts.return_snippet, opts.annotation_convention)
+    return require("neogen.generator")(vim.bo.filetype, opts.type, opts.return_snippet, opts.annotation_convention, opts.sections)
 end
 
 -- Expose more API  ============================================================
@@ -309,7 +309,7 @@ end
 ---     with multiple annotation conventions.
 ---@tag neogen-changelog
 ---@toc_entry Changes in neogen plugin
-neogen.version = "2.19.4"
+neogen.version = "2.20.0"
 --minidoc_afterlines_end
 
 return neogen
