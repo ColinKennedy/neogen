@@ -929,7 +929,7 @@ describe("python: google_docstrings", function()
             local expected = [[
         def foo(thing):
             """An existing docstring.
-
+            
             Yields:
                 [TODO:description]
             """
@@ -969,7 +969,7 @@ describe("python: google_docstrings", function()
             local expected = [[
         def foo(thing):
             """An existing docstring.
-
+            
             Args:
                 thing ([TODO:parameter]): [TODO:description]
 
